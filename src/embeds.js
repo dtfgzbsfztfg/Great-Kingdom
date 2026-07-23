@@ -1,7 +1,8 @@
 'use strict';
 
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
 const { BLUE, ORANGE, colorName } = require('./game');
+const { renderBoardPNG } = require('./boardImage');
 
 const BLUE_COLOR = 0x3498db;
 const ORANGE_COLOR = 0xe67e22;
@@ -11,11 +12,18 @@ function nameFor(entry, color) {
   return color === BLUE ? entry.blueName : entry.orangeName;
 }
 
-function statusEmbed(entry, extraDescription) {
+/**
+ * 보드를 SVG->PNG로 렌더링해 첨부하고, 그 이미지를 임베드에 삽입한
+ * { embeds, files } 형태의 메시지 페이로드를 만든다. (interaction.reply()에 그대로 스프레드 가능)
+ */
+async function buildBoardMessage(entry, extraDescription) {
   const { game } = entry;
+  const pngBuffer = await renderBoardPNG(game);
+  const attachment = new AttachmentBuilder(pngBuffer, { name: 'board.png' });
+
   const embed = new EmbedBuilder()
     .setTitle('🏯 그레이트 킹덤 (Great Kingdom)')
-    .setDescription(game.render())
+    .setImage('attachment://board.png')
     .addFields(
       { name: '파랑 (선공)', value: `<@${entry.blueId}>`, inline: true },
       { name: '주황 (후공, 덤 +3)', value: `<@${entry.orangeId}>`, inline: true },
@@ -47,7 +55,7 @@ function statusEmbed(entry, extraDescription) {
   }
 
   embed.setFooter({ text: '위즈스톤 시리즈 · 이세돌 디자인 · 코리아보드게임즈' });
-  return embed;
+  return { embeds: [embed], files: [attachment] };
 }
 
 function scoreLines(scores) {
@@ -57,4 +65,4 @@ function scoreLines(scores) {
   ].join('\n');
 }
 
-module.exports = { statusEmbed, scoreLines, BLUE_COLOR, ORANGE_COLOR };
+module.exports = { buildBoardMessage, scoreLines, BLUE_COLOR, ORANGE_COLOR };
