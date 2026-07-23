@@ -1,0 +1,18 @@
+{
+  "name": "great-kingdom-discord-bot",
+  "version": "1.0.0",
+  "description": "위즈스톤 시리즈 '그레이트 킹덤' 보드게임을 즐길 수 있는 디스코드 봇",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "deploy": "node deploy-commands.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
